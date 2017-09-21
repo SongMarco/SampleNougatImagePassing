@@ -3,6 +3,8 @@ package nova.samplenougatimagepassing;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView img;
@@ -50,8 +53,37 @@ public class MainActivity extends AppCompatActivity {
         if( resultCode == RESULT_OK){
             switch ( requestCode ) {
                 case 1:
-                    Bitmap bitmap = BitmapFactory.decodeFile( imgPath );
-                    img.setImageBitmap( bitmap );
+
+                    //비트맵을 파일에서 얻어와 회전값에 따라 다르게 세팅하여, 이미지뷰에 붙여준다!!
+
+                    BitmapFactory.Options bounds = new BitmapFactory.Options();
+                    bounds.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(imgPath, bounds);
+
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    Bitmap bm = BitmapFactory.decodeFile(imgPath, opts);
+                    ExifInterface exif = null;
+                    try {
+                        exif = new ExifInterface(imgPath);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+                    int orientation = orientString != null ? Integer.parseInt(orientString) :  ExifInterface.ORIENTATION_NORMAL;
+
+                    int rotationAngle = 0;
+                    if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+                    if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+                    if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+
+                    Matrix matrix = new Matrix();
+                    matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
+                    Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
+
+
+                    img.setImageBitmap( rotatedBitmap );
+
+
                     break;
 
                 case 2:
@@ -81,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
         imgPath = file.getAbsolutePath();
 
         Log.v("dd",getApplicationContext().getPackageName()+".fileprovider");
+
+
+
         return FileProvider.getUriForFile( MainActivity.this, getApplicationContext().getPackageName()+".fileprovider", file );
     }
 
