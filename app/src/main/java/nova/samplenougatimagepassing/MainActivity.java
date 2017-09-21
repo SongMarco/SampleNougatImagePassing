@@ -25,13 +25,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
         img = ( ImageView ) findViewById( R.id.img );
+
         findViewById( R.id.btnCamera ).setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
-//            showCamera();
-                doTakeAlbumAction();
+            showCamera();
+
             }
         } );
+
+        findViewById( R.id.button).setOnClickListener(new View.OnClickListener(){
+
+
+            @Override
+            public void onClick(View v) {
+                doTakeAlbumAction();
+            }
+        });
     }
 
     @Override

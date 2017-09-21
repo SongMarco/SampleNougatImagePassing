@@ -23,7 +23,13 @@
         android:id = "@+id/btnCamera"
         android:layout_width = "wrap_content"
         android:layout_height = "wrap_content"
-        android:text = "사진"
+        android:text = "사진 찍기"
         />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="앨범에서 가져오기" />
 </LinearLayout>
 
